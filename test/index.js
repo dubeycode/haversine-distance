@@ -10,3 +10,11 @@ fixtures.forEach(function (f) {
     t.ok(Math.round(actual) === f.expected, `${actual} ~= ${f.expected}`)
   })
 })
+
+tape('throws when longitude is missing', function (t) {
+  const a = { latitude: 37.8136 }
+  const b = { latitude: 33.8650, longitude: 151.2094 }
+
+  t.plan(1)
+  t.throws(function () { haversine(a, b) }, /start longitude must be a finite number/)
+})

@@ -13,14 +13,30 @@ function hav (x) {
   return squared(sin(x / 2))
 }
 
+function readPoint (point, label) {
+  if (point == null) {
+    throw new TypeError(`haversine-distance: ${label} coordinate is missing`)
+  }
+
+  const lat = Array.isArray(point) ? point[1] : point.latitude ?? point.lat
+  const lng = Array.isArray(point) ? point[0] : point.longitude ?? point.lng ?? point.lon
+
+  if (!Number.isFinite(lat)) {
+    throw new TypeError(`haversine-distance: ${label} latitude must be a finite number`)
+  }
+  if (!Number.isFinite(lng)) {
+    throw new TypeError(`haversine-distance: ${label} longitude must be a finite number`)
+  }
+
+  return { lat: toRad(lat), lng: toRad(lng) }
+}
+
 // hav(theta) = hav(bLat - aLat) + cos(aLat) * cos(bLat) * hav(bLon - aLon)
 function haversineDistance (a, b) {
-  const aLat = toRad(Array.isArray(a) ? a[1] : a.latitude ?? a.lat)
-  const bLat = toRad(Array.isArray(b) ? b[1] : b.latitude ?? b.lat)
-  const aLng = toRad(Array.isArray(a) ? a[0] : a.longitude ?? a.lng ?? a.lon)
-  const bLng = toRad(Array.isArray(b) ? b[0] : b.longitude ?? b.lng ?? b.lon)
+  const start = readPoint(a, 'start')
+  const end = readPoint(b, 'end')
 
-  const ht = hav(bLat - aLat) + cos(aLat) * cos(bLat) * hav(bLng - aLng)
+  const ht = hav(end.lat - start.lat) + cos(start.lat) * cos(end.lat) * hav(end.lng - start.lng)
   return 2 * R * atan2(sqrt(ht), sqrt(1 - ht))
 }
 
